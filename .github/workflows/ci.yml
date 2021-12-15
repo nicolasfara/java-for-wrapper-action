@@ -1,0 +1,57 @@
+name: Test and release
+
+on:
+  push:
+    branches-ignore:
+      - 'renovate/**'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          path: 'action'
+      - name: Trick Renovate
+        id: trick
+        shell: bash
+        run: |
+          # Idea: the regex matcher of Renovate keeps this string up to date automatically
+          # The version is extracted and used to access the correct version of the scripts
+          USES=$(cat <<TRICK_RENOVATE
+          - uses: nicolasfara/ktor-test@1.0.0
+          TRICK_RENOVATE
+          )
+          echo "Scripts update line: \"$USES\""
+          echo "Computed version: \"${USES#*@}\""
+          echo "::set-output name=version::${USES#*@}"
+      - name: Checkout test repo
+        uses: actions/checkout@v2.4.0
+        with:
+          repository: nicolasfara/ktor-test
+          path: 'target'
+          ref: ${{ steps.trick.outputs.version }}
+      - name: Testing action
+        uses: ./action
+        with:
+          wrapper-path: './target/gradle/wrapper/gradle-wrapper.properties'
+      - name: Echo java version
+        run: java --version
+        shell: bash
+
+  release:
+    needs: [test]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        run: |
+          npm install
+          npx semantic-release
