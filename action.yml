@@ -1,0 +1,20 @@
+name: 'Set java for gradle wrapper'
+
+inputs:
+  wrapper-path:
+    description: "The path to gradle-wrapper.properties file"
+    required: false
+    default: "./gradle/wrapper/gradle-wrapper.properties"
+
+runs:
+  using: "composite"
+    steps:
+      - uses: nicolasfara/check-gradle-wrapper-action@v1
+        id: wrapper-check
+        with:
+          gradle-wrapper-path: ${{ inputs.wrapper-path }}
+      
+      - uses: actions/setup-java@2.4.0
+        with:
+          distribution: 'adopt'
+          java-version: ${{ steps.wrapper-check.java-version }}
