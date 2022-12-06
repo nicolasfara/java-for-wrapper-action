@@ -14,7 +14,7 @@ runs:
       with:
         gradle-wrapper-path: ${{ inputs.wrapper-path }}
     
-    - uses: actions/setup-java@v3.7.0
+    - uses: actions/setup-java@v3.8.0
       with:
         distribution: 'adopt'
         java-version: ${{ steps.wrapper-check.outputs.java-version }}
