@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.0
         with:
           path: 'action'
       - name: Trick Renovate
@@ -29,7 +29,7 @@ jobs:
           echo "Computed version: \"${USES#*@}\""
           echo "::set-output name=version::${USES#*@}"
       - name: Checkout test repo
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.0
         with:
           repository: nicolasfara/ktor-test
           path: 'target'
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.0
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
